@@ -1,6 +1,6 @@
 from flask import Flask, request
 from flask_restful import Resource, Api
-from habilidades import Habilidades, Habilidade
+from habilidades import Habilidades, Habilidade, lista_habilidades
 import json
 
 app= Flask(__name__)
@@ -23,11 +23,25 @@ class Desenvolvedores(Resource):
         return desenvolvedores
     def post(self):
          dados = json.loads(request.data)
-         posicao= len(desenvolvedores)
-         dados['id']= posicao
-         desenvolvedores.append(dados)
-         return desenvolvedores[posicao]
-
+         lista_dados= dados.get('habilidades')
+         cont=0
+         for i in range(0 ,len(lista_habilidades)):
+            for j in range(0, len(lista_dados)):
+                if lista_habilidades[i] == lista_dados[j]:
+                    cont+=1
+         if(cont == 2):
+            posicao= len(desenvolvedores)
+            dados['id']= posicao
+            desenvolvedores.append(dados)
+            return desenvolvedores[posicao] 
+                   
+         elif(cont == 1):
+            return {'status': 'erro', 'mensagem': 'só uma das habilidades existe na lista de habilidade'}
+             
+        
+         elif(cont == 0):
+            return {'status': 'erro', 'mensagem': 'nenhuma das habilidades existe na lista de habilidade'}
+             
 class Desenvolvedor(Resource):
     def get(self, id):
         try:
